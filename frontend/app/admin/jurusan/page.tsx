@@ -192,6 +192,7 @@ export default function AdminJurusanPage() {
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(jurusan)}
+                          title="Edit"
                           className="p-1 text-blue-600 hover:bg-blue-50 rounded"
                         >
                           <Pencil className="h-4 w-4" />
@@ -200,6 +201,7 @@ export default function AdminJurusanPage() {
                           type="button"
                           onClick={() => handleDelete(jurusan.id)}
                           disabled={deleteId === jurusan.id}
+                          title="Hapus"
                           className="p-1 text-red-600 hover:bg-red-50 rounded disabled:opacity-50"
                         >
                           {deleteId === jurusan.id ? (
@@ -228,6 +230,7 @@ export default function AdminJurusanPage() {
               </h2>
               <button
                 type="button"
+                title="Tutup"
                 onClick={() => setIsModalOpen(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
@@ -274,6 +277,7 @@ export default function AdminJurusanPage() {
                 </label>
                 <select
                   value={formData.kategori}
+                  title="Kategori Jurusan"
                   onChange={(e) =>
                     setFormData({
                       ...formData,

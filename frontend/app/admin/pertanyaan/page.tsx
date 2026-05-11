@@ -147,6 +147,7 @@ export default function AdminPertanyaanPage() {
         </div>
         <select
           value={filterKategori}
+          title="Filter Kategori"
           onChange={(e) => setFilterKategori(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         >
@@ -215,6 +216,7 @@ export default function AdminPertanyaanPage() {
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(pertanyaan)}
+                            title="Edit"
                             className="p-1 text-blue-600 hover:bg-blue-50 rounded"
                           >
                             <Pencil className="h-4 w-4" />
@@ -223,6 +225,7 @@ export default function AdminPertanyaanPage() {
                             type="button"
                             onClick={() => handleDelete(pertanyaan.id)}
                             disabled={deleteId === pertanyaan.id}
+                            title="Hapus"
                             className="p-1 text-red-600 hover:bg-red-50 rounded disabled:opacity-50"
                           >
                             {deleteId === pertanyaan.id ? (
@@ -251,6 +254,7 @@ export default function AdminPertanyaanPage() {
               </h2>
               <button
                 type="button"
+                title="Tutup"
                 onClick={() => setIsModalOpen(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
@@ -265,6 +269,7 @@ export default function AdminPertanyaanPage() {
                 </label>
                 <input
                   type="text"
+                  placeholder="Kode"
                   value={formData.kode}
                   onChange={(e) =>
                     setFormData({ ...formData, kode: e.target.value })
@@ -280,6 +285,7 @@ export default function AdminPertanyaanPage() {
                 </label>
                 <textarea
                   value={formData.teks}
+                  placeholder="Teks Pertanyaan"
                   onChange={(e) =>
                     setFormData({ ...formData, teks: e.target.value })
                   }
@@ -295,6 +301,7 @@ export default function AdminPertanyaanPage() {
                 </label>
                 <select
                   value={formData.kategori}
+                  title="Pilih Kategori"
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -314,6 +321,7 @@ export default function AdminPertanyaanPage() {
                 </label>
                 <input
                   type="number"
+                  title="Masukkan Urutan"
                   value={formData.urutan}
                   onChange={(e) =>
                     setFormData({

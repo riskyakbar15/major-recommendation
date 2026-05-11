@@ -197,6 +197,7 @@ export default function AdminKonsultasiPage() {
               </h2>
               <button
                 type="button"
+                title="Tutup"
                 onClick={() => setDetailModal(null)}
                 className="text-gray-400 hover:text-gray-600"
               >

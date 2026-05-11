@@ -25,6 +25,11 @@ body {
       text-wrap: balance;
     }
   }
+
+  /* Progress bar width using CSS custom property */
+  .progress-bar {
+    width: var(--progress, 0%);
+  }
 }
 
 /* Custom scrollbar */

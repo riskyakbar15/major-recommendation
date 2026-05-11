@@ -150,6 +150,7 @@ export default function AdminRulesPage() {
         </div>
         <select
           value={filterJurusan}
+          title="Filter Jurusan"
           onChange={(e) => setFilterJurusan(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         >
@@ -227,6 +228,7 @@ export default function AdminRulesPage() {
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(rule)}
+                          title="Edit"
                           className="p-1 text-blue-600 hover:bg-blue-50 rounded"
                         >
                           <Pencil className="h-4 w-4" />
@@ -235,6 +237,7 @@ export default function AdminRulesPage() {
                           type="button"
                           onClick={() => handleDelete(rule.id)}
                           disabled={deleteId === rule.id}
+                          title="Hapus"
                           className="p-1 text-red-600 hover:bg-red-50 rounded disabled:opacity-50"
                         >
                           {deleteId === rule.id ? (
@@ -263,6 +266,7 @@ export default function AdminRulesPage() {
               </h2>
               <button
                 type="button"
+                title="Tutup"
                 onClick={() => setIsModalOpen(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
@@ -277,6 +281,7 @@ export default function AdminRulesPage() {
                 </label>
                 <select
                   value={formData.jurusan_id}
+                  title="Pilih Jurusan"
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -299,6 +304,7 @@ export default function AdminRulesPage() {
                 </label>
                 <select
                   value={formData.pertanyaan_id}
+                  title="Pilih Pertanyaan"
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -321,6 +327,7 @@ export default function AdminRulesPage() {
                 </label>
                 <select
                   value={formData.operator}
+                  title="Pilih Operator"
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -344,6 +351,7 @@ export default function AdminRulesPage() {
                   step="0.1"
                   min="0"
                   max="1"
+                  placeholder="0.5"
                   value={formData.nilai_kondisi}
                   onChange={(e) =>
                     setFormData({
@@ -361,6 +369,7 @@ export default function AdminRulesPage() {
                 </label>
                 <input
                   type="number"
+                  placeholder="0.8"
                   step="0.1"
                   min="0"
                   max="1"
