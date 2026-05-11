@@ -125,6 +125,7 @@ export default function AdminRulesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Kelola Rules</h1>
         <button
+          type="button"
           onClick={handleOpenCreate}
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
@@ -224,12 +225,14 @@ export default function AdminRulesPage() {
                     <td className="px-6 py-4 text-center text-sm">
                       <div className="flex items-center justify-center gap-2">
                         <button
+                          type="button"
                           onClick={() => handleOpenEdit(rule)}
                           className="p-1 text-blue-600 hover:bg-blue-50 rounded"
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleDelete(rule.id)}
                           disabled={deleteId === rule.id}
                           className="p-1 text-red-600 hover:bg-red-50 rounded disabled:opacity-50"
@@ -259,6 +262,7 @@ export default function AdminRulesPage() {
                 {editingRule ? "Edit Rule" : "Tambah Rule"}
               </h2>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
                 className="text-gray-400 hover:text-gray-600"
               >

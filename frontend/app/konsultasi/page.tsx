@@ -79,6 +79,7 @@ export default function KonsultasiPage() {
           </h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
+            type="button"
             onClick={fetchQuestions}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
@@ -133,6 +134,7 @@ export default function KonsultasiPage() {
                 Kembali
               </Link>
               <button
+                type="button"
                 onClick={() => setHasStarted(true)}
                 className="px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center"
               >
@@ -185,6 +187,7 @@ export default function KonsultasiPage() {
               {ANSWER_OPTIONS.map((option) => (
                 <button
                   key={option.value}
+                  type="button"
                   onClick={() => handleAnswerSelect(option.value)}
                   className={`w-full p-4 text-left border-2 rounded-lg transition-colors ${
                     currentAnswer === option.value
@@ -217,6 +220,7 @@ export default function KonsultasiPage() {
         {/* Navigation */}
         <div className="flex gap-4">
           <button
+            type="button"
             onClick={prevQuestion}
             disabled={isFirstQuestion}
             className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
@@ -225,6 +229,7 @@ export default function KonsultasiPage() {
             Sebelumnya
           </button>
           <button
+            type="button"
             onClick={handleNext}
             disabled={currentAnswer === undefined || submitting}
             className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"

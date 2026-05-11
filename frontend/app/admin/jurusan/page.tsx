@@ -108,6 +108,7 @@ export default function AdminJurusanPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Kelola Jurusan</h1>
         <button
+          type="button"
           onClick={handleOpenCreate}
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
@@ -189,12 +190,14 @@ export default function AdminJurusanPage() {
                     <td className="px-6 py-4 text-center text-sm">
                       <div className="flex items-center justify-center gap-2">
                         <button
+                          type="button"
                           onClick={() => handleOpenEdit(jurusan)}
                           className="p-1 text-blue-600 hover:bg-blue-50 rounded"
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleDelete(jurusan.id)}
                           disabled={deleteId === jurusan.id}
                           className="p-1 text-red-600 hover:bg-red-50 rounded disabled:opacity-50"
@@ -224,6 +227,7 @@ export default function AdminJurusanPage() {
                 {editingJurusan ? "Edit Jurusan" : "Tambah Jurusan"}
               </h2>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
@@ -239,6 +243,7 @@ export default function AdminJurusanPage() {
                 <input
                   type="text"
                   value={formData.kode}
+                  placeholder="Masukkan kode jurusan"
                   onChange={(e) =>
                     setFormData({ ...formData, kode: e.target.value })
                   }
@@ -253,6 +258,7 @@ export default function AdminJurusanPage() {
                 </label>
                 <input
                   type="text"
+                  placeholder="Masukkan nama jurusan"
                   value={formData.nama}
                   onChange={(e) =>
                     setFormData({ ...formData, nama: e.target.value })
@@ -287,6 +293,7 @@ export default function AdminJurusanPage() {
                 </label>
                 <textarea
                   value={formData.deskripsi}
+                  placeholder="Masukkan deskripsi jurusan"
                   onChange={(e) =>
                     setFormData({ ...formData, deskripsi: e.target.value })
                   }
@@ -301,6 +308,7 @@ export default function AdminJurusanPage() {
                 </label>
                 <textarea
                   value={formData.prospek_kerja}
+                  placeholder="Masukkan prospek kerja"
                   onChange={(e) =>
                     setFormData({ ...formData, prospek_kerja: e.target.value })
                   }

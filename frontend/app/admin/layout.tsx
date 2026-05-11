@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -15,7 +15,6 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useState } from "react";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -32,7 +31,7 @@ const menuItems = [
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { admin, loading, isAuthenticated, logout } = useAuth();
+  const { admin, loading, isAuthenticated } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -40,6 +39,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       router.push("/admin/login");
     }
   }, [loading, isAuthenticated, router, pathname]);
+
+  // Auto-close sidebar when navigating
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   // Don't render layout for login page
   if (pathname === "/admin/login") {
@@ -61,7 +65,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   const handleLogout = async () => {
-    await logout();
     router.push("/admin/login");
   };
 
@@ -84,13 +87,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-4 bg-gray-800">
-            <Link href="/admin" className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <GraduationCap className="h-8 w-8 text-blue-500" />
               <span className="text-lg font-bold text-white">
                 SiPakar Admin
               </span>
-            </Link>
+            </div>
             <button
+              type="button"
               onClick={() => setSidebarOpen(false)}
               className="lg:hidden text-gray-400 hover:text-white"
               aria-label="Close sidebar"
@@ -105,19 +109,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               const Icon = item.icon;
               const isActive = pathname === item.href;
               return (
-                <Link
+                <div
                   key={item.href}
-                  href={item.href}
-                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors cursor-pointer ${
                     isActive
                       ? "bg-blue-600 text-white"
                       : "text-gray-300 hover:bg-gray-800 hover:text-white"
                   }`}
-                  onClick={() => setSidebarOpen(false)}
+                  onClick={() => router.push(item.href)}
                 >
                   <Icon className="h-5 w-5 mr-3" />
                   {item.label}
-                </Link>
+                </div>
               );
             })}
           </nav>
@@ -137,6 +140,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={handleLogout}
                 className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition-colors"
                 title="Logout"
@@ -154,6 +158,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <header className="bg-white shadow-sm sticky top-0 z-40">
           <div className="flex items-center justify-between h-16 px-4 lg:px-8">
             <button
+              type="button"
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden text-gray-600 hover:text-gray-900"
               aria-label="Toggle sidebar"

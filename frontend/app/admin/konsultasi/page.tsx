@@ -144,6 +144,7 @@ export default function AdminKonsultasiPage() {
                     </td>
                     <td className="px-6 py-4 text-center text-sm">
                       <button
+                        type="button"
                         onClick={() => handleViewDetail(konsultasi)}
                         className="inline-flex items-center px-3 py-1 text-blue-600 hover:bg-blue-50 rounded"
                       >
@@ -163,6 +164,7 @@ export default function AdminKonsultasiPage() {
       {totalPages > 1 && (
         <div className="mt-6 flex items-center justify-between">
           <button
+            type="button"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
@@ -174,6 +176,7 @@ export default function AdminKonsultasiPage() {
             Halaman {page} dari {totalPages}
           </span>
           <button
+            type="button"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
@@ -193,6 +196,7 @@ export default function AdminKonsultasiPage() {
                 Detail Konsultasi
               </h2>
               <button
+                type="button"
                 onClick={() => setDetailModal(null)}
                 className="text-gray-400 hover:text-gray-600"
               >
