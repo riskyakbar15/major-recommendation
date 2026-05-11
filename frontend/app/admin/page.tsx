@@ -147,69 +147,8 @@ export default function AdminDashboardPage() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-8">
-              Belum ada data konsultasi
-            </p>
+            <p className="text-gray-500 text-center py-8">Belum ada data</p>
           )}
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Aktivitas Harian (7 Hari Terakhir)
-          </h2>
-          {stats?.daily_stats && stats.daily_stats.length > 0 ? (
-            <div className="space-y-3">
-              {stats.daily_stats.map((stat, index) => (
-                <div key={index} className="flex items-center">
-                  <span className="w-24 text-sm text-gray-500">
-                    {new Date(stat.date).toLocaleDateString("id-ID", {
-                      weekday: "short",
-                      day: "numeric",
-                      month: "short",
-                    })}
-                  </span>
-                  <div className="flex-1 mx-3">
-                    <div className="h-6 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-blue-500 rounded-full transition-all duration-300"
-                        style={{
-                          width: `${Math.min(100, (stat.count / Math.max(...stats.daily_stats.map((s) => s.count))) * 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <span className="w-8 text-sm font-medium text-gray-900 text-right">
-                    {stat.count}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center py-8">
-              Belum ada data aktivitas
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Quick Info */}
-      <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-6">
-        <h3 className="font-semibold text-blue-900 mb-2">
-          Informasi Sistem Pakar
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-blue-800">
-          <div>
-            <p className="font-medium">Metode Inferensi</p>
-            <p>Forward Chaining</p>
-          </div>
-          <div>
-            <p className="font-medium">Perhitungan Kepastian</p>
-            <p>Certainty Factor (CF)</p>
-          </div>
-          <div>
-            <p className="font-medium">Threshold Minimum</p>
-            <p>CF ≥ 0.3 (30%)</p>
-          </div>
         </div>
       </div>
     </div>

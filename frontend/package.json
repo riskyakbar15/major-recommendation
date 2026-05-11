@@ -12,7 +12,7 @@
     "axios": "^1.6.5",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.311.0",
-    "next": "^16.1.6",
+    "next": "^9.3.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "recharts": "^2.10.4"

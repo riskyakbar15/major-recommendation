@@ -148,51 +148,35 @@ export default function KonsultasiPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <Link
-            href="/"
-            className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Beranda
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Konsultasi Jurusan
-          </h1>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>
+          <div className="flex items-center justify-between mb-4">
+            <Link
+              href="/"
+              className="inline-flex items-center text-gray-600 hover:text-blue-600"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Kembali
+            </Link>
+            <span className="text-sm text-gray-600">
               Pertanyaan {currentIndex + 1} dari {questions.length}
             </span>
-            <span>{Math.round(progress)}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
+
+          {/* Progress Bar */}
+          <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className={`bg-blue-600 h-3 rounded-full transition-all duration-300 w-[${Math.round(progress)}%]`}
+              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
         {/* Question Card */}
         {currentQuestion && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
-            <div className="mb-2">
-              <span
-                className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                  currentQuestion.kategori === "minat"
-                    ? "bg-purple-100 text-purple-700"
-                    : "bg-green-100 text-green-700"
-                }`}
-              >
-                {currentQuestion.kategori === "minat" ? "Minat" : "Bakat"}
-              </span>
-            </div>
-            <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-8">
+          <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
               {currentQuestion.teks}
             </h2>
 
@@ -202,17 +186,27 @@ export default function KonsultasiPage() {
                 <button
                   key={option.value}
                   onClick={() => handleAnswerSelect(option.value)}
-                  className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                  className={`w-full p-4 text-left border-2 rounded-lg transition-colors ${
                     currentAnswer === option.value
-                      ? "border-blue-600 bg-blue-50 text-blue-900"
-                      : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                      ? "border-blue-600 bg-blue-50"
+                      : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{option.label}</span>
-                    {currentAnswer === option.value && (
-                      <CheckCircle className="h-5 w-5 text-blue-600" />
-                    )}
+                  <div className="flex items-center">
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${
+                        currentAnswer === option.value
+                          ? "border-blue-600 bg-blue-600"
+                          : "border-gray-300"
+                      }`}
+                    >
+                      {currentAnswer === option.value && (
+                        <CheckCircle className="h-4 w-4 text-white" />
+                      )}
+                    </div>
+                    <span className="font-medium text-gray-900">
+                      {option.label}
+                    </span>
                   </div>
                 </button>
               ))}
@@ -220,73 +214,43 @@ export default function KonsultasiPage() {
           </div>
         )}
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between">
+        {/* Navigation */}
+        <div className="flex gap-4">
           <button
             onClick={prevQuestion}
             disabled={isFirstQuestion}
-            className={`flex items-center px-6 py-3 rounded-xl transition-colors ${
-              isFirstQuestion
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
-            }`}
+            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-5 w-5 mr-2" />
             Sebelumnya
           </button>
-
           <button
             onClick={handleNext}
             disabled={currentAnswer === undefined || submitting}
-            className={`flex items-center px-6 py-3 rounded-xl transition-colors ${
-              currentAnswer === undefined || submitting
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : isLastQuestion && isComplete
-                  ? "bg-green-600 text-white hover:bg-green-700"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
+            className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
           >
             {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Memproses...
+                <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                Mengirim...
               </>
             ) : isLastQuestion && isComplete ? (
               <>
-                Lihat Hasil
-                <CheckCircle className="h-4 w-4 ml-2" />
+                <CheckCircle className="h-5 w-5 mr-2" />
+                Selesai
               </>
             ) : (
               <>
                 Selanjutnya
-                <ArrowRight className="h-4 w-4 ml-2" />
+                <ArrowRight className="h-5 w-5 ml-2" />
               </>
             )}
           </button>
         </div>
 
-        {/* Question Indicators */}
-        <div className="mt-8 flex flex-wrap gap-2 justify-center">
-          {questions.map((q, idx) => {
-            const isAnswered = questions[idx]
-              ? questions[idx].id !== undefined &&
-                answers.has(questions[idx].id)
-              : false;
-            return (
-              <div
-                key={q.id}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                  idx === currentIndex
-                    ? "bg-blue-600 text-white"
-                    : currentAnswer !== undefined && idx <= currentIndex
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-200 text-gray-600"
-                }`}
-              >
-                {idx + 1}
-              </div>
-            );
-          })}
+        {/* Question Status */}
+        <div className="mt-8 text-center text-sm text-gray-600">
+          {answers.size}/{questions.length} pertanyaan terjawab
         </div>
       </div>
     </div>

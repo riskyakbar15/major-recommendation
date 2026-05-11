@@ -149,26 +149,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </aside>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="lg:ml-64">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-white shadow-sm">
+        <header className="bg-white shadow-sm sticky top-0 z-40">
           <div className="flex items-center justify-between h-16 px-4 lg:px-8">
             <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
-              aria-label="Open sidebar"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="lg:hidden text-gray-600 hover:text-gray-900"
+              aria-label="Toggle sidebar"
             >
               <Menu className="h-6 w-6" />
             </button>
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/"
-                className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
-                target="_blank"
-              >
-                Lihat Website →
-              </Link>
-            </div>
+            <div className="flex-1" />
           </div>
         </header>
 

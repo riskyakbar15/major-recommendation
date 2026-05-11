@@ -98,13 +98,13 @@ export default function AdminLoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors pr-12"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   placeholder="Masukkan password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -118,12 +118,12 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {loading ? (
                 <>
-                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  Logging in...
+                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                  Loading...
                 </>
               ) : (
                 "Login"
@@ -131,21 +131,14 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
+          <p className="text-center text-sm text-gray-600 mt-6">
+            Kembali ke{" "}
             <Link
               href="/"
-              className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
+              className="text-blue-600 hover:text-blue-700 font-medium"
             >
-              ← Kembali ke Beranda
+              beranda
             </Link>
-          </div>
-        </div>
-
-        {/* Demo Credentials */}
-        <div className="mt-6 text-center text-gray-400 text-sm">
-          <p>
-            Demo: username <strong>admin</strong>, password{" "}
-            <strong>admin123</strong>
           </p>
         </div>
       </div>

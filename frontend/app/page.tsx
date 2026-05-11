@@ -150,39 +150,36 @@ export default function Home() {
               "Akuntansi",
               "Psikologi",
               "Teknik Sipil",
-              "Ilmu Komunikasi",
-              "Farmasi",
-              "Arsitektur",
+              "Biologi",
+              "Ekonomi",
+              "Desain Grafis",
               "Teknik Elektro",
-              "Pendidikan Guru SD",
-              "Ekonomi Pembangunan",
-              "Desain Komunikasi Visual",
-              "Hubungan Internasional",
+              "Fisika",
+              "Pendidikan",
+              "Sastra Inggris",
+              "Komunikasi",
             ].map((jurusan) => (
               <div
                 key={jurusan}
-                className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow flex items-center space-x-2"
+                className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow text-center"
               >
-                <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                <span className="text-sm text-gray-700">{jurusan}</span>
+                <p className="text-sm font-medium text-gray-900">{jurusan}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 md:p-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-              Siap Menemukan Jurusan Impianmu?
-            </h2>
-            <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
-              Konsultasi gratis dan tanpa perlu mendaftar. Cukup jawab beberapa
-              pertanyaan dan dapatkan rekomendasi jurusan terbaik.
+        {/* CTA Section */}
+        <div className="mt-20 text-center">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-12 text-white">
+            <h2 className="text-3xl font-bold mb-4">Siap Memulai?</h2>
+            <p className="text-xl opacity-90 mb-8">
+              Temukan jurusan yang paling sesuai dengan minat dan bakat Anda
+              hari ini!
             </p>
             <Link
               href="/konsultasi"
-              className="inline-flex items-center px-8 py-4 bg-white text-blue-600 text-lg font-semibold rounded-xl hover:bg-blue-50 transition-colors shadow-lg"
+              className="inline-flex items-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-xl hover:bg-gray-100 transition-colors"
             >
               Mulai Konsultasi Sekarang
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -190,19 +187,6 @@ export default function Home() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 mt-16 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p>
-            &copy; 2026 Sistem Pakar Bimbingan Jurusan Kuliah. All rights
-            reserved.
-          </p>
-          <p className="text-sm mt-2">
-            Dibuat dengan metode Forward Chaining dan Certainty Factor
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
