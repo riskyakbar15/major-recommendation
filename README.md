@@ -1,105 +1,123 @@
-# 🎓 Sistem Pakar Jurusan
+# Sistem Pakar Rekomendasi Jurusan
 
-[![Go](https://img.shields.io/badge/Go-1.20+-00ADD8?style=flat-square&logo=go&logoColor=white)](https://golang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-16+-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+Aplikasi web untuk membantu calon mahasiswa mendapatkan rekomendasi jurusan kuliah berdasarkan jawaban konsultasi minat dan bakat. Sistem menggunakan pendekatan **Forward Chaining** untuk pencocokan aturan dan **Certainty Factor** untuk menghitung tingkat keyakinan hasil rekomendasi.
 
-> Aplikasi sistem pakar untuk rekomendasi jurusan kuliah berbasis minat dan bakat menggunakan metode **Certainty Factor** dan **Forward Chaining**.
+## Ringkasan Proyek
 
----
+Proyek ini terdiri dari dua aplikasi terpisah:
 
-## ✨ Fitur Utama
+- **Backend**: REST API berbasis Go dan Gin untuk autentikasi, konsultasi, manajemen data, dan statistik.
+- **Frontend**: Antarmuka web berbasis Next.js, React, Tailwind CSS, dan TypeScript untuk pengalaman pengguna dan dashboard admin.
 
-- 🧠 **Sistem Pakar** — Rekomendasi jurusan berdasarkan analisis minat dan bakat
-- 📊 **Dashboard Admin** — Kelola jurusan, pertanyaan, dan rules
-- 📈 **Statistik** — Visualisasi data konsultasi
-- 🔐 **Autentikasi JWT** — Keamanan dengan access & refresh token
-- 📱 **Responsive Design** — Tampilan optimal di semua perangkat
+## Fitur Utama
 
----
+- Rekomendasi jurusan berdasarkan jawaban konsultasi.
+- Perhitungan hasil dengan metode Certainty Factor.
+- Proses inferensi berbasis Forward Chaining.
+- Dashboard admin untuk mengelola jurusan, pertanyaan, dan rules.
+- Autentikasi JWT dengan access token dan refresh token.
+- Halaman statistik dan riwayat konsultasi.
+- Tampilan responsif untuk desktop dan perangkat mobile.
 
-## 📁 Struktur Proyek
+## Teknologi yang Digunakan
 
-```Struktur Proyek
-sistem-pakar-jurusan/
-├── backend/                 # API Server (Go + Gin)
+### Tech Backend
+
+- Go 1.21
+- Gin
+- MySQL
+- JWT (`github.com/golang-jwt/jwt/v5`)
+- `godotenv`
+
+### Tech Frontend
+
+- Next.js 16.2.6
+- React 19.2.6
+- TypeScript
+- Tailwind CSS 3.4.1
+- Axios
+- Lucide React
+- Recharts
+
+## Struktur Proyek
+
+```text
+major-recommendation/
+├── backend/
 │   ├── internal/
-│   │   ├── auth/            # JWT authentication
-│   │   ├── config/          # Konfigurasi aplikasi
-│   │   ├── database/        # Koneksi database
-│   │   ├── expert/          # Certainty Factor & Forward Chaining
-│   │   ├── handlers/        # HTTP handlers
-│   │   ├── middleware/      # Auth middleware
-│   │   ├── models/          # Data models
-│   │   ├── repository/      # Database queries
-│   │   └── services/        # Business logic
-│   └── migrations/          # SQL schema & seed data
-│
-└── frontend/                # Web UI (Next.js + Tailwind CSS)
-    └── src/
-        ├── app/             # Pages & layouts
-        ├── hooks/           # Custom React hooks
-        ├── lib/             # API client
-        └── types/           # TypeScript definitions
+│   │   ├── auth/          # utilitas autentikasi JWT
+│   │   ├── config/        # konfigurasi aplikasi
+│   │   ├── database/      # koneksi MySQL
+│   │   ├── expert/        # Forward Chaining dan Certainty Factor
+│   │   ├── handlers/      # HTTP handler
+│   │   ├── middleware/     # middleware autentikasi
+│   │   ├── models/        # struktur data
+│   │   ├── repository/    # akses data ke database
+│   │   └── services/      # business logic
+│   ├── migrations/        # schema dan seed data SQL
+│   ├── go.mod
+│   └── main.go
+├── frontend/
+│   ├── app/               # halaman Next.js
+│   ├── hooks/             # custom React hooks
+│   ├── lib/               # API client
+│   ├── types/             # tipe TypeScript
+│   ├── package.json
+│   └── next.config.js
+└── README.md
 ```
 
----
+## Prasyarat
 
-## 🛠️ Prasyarat
+Pastikan environment berikut sudah tersedia:
 
-| Software      | Versi Minimum |
-| ------------- | ------------- |
-| Go            | 1.20+         |
-| Node.js       | 18+           |
-| npm           | 9+            |
-| MySQL/MariaDB | 8.0+          |
+| Komponen        | Versi minimum |
+| --------------- | ------------- |
+| Go              | 1.21          |
+| Node.js         | 18            |
+| npm             | 9             |
+| MySQL / MariaDB | 8             |
 
----
+## Konfigurasi Environment
 
-## ⚙️ Konfigurasi Environment
+### Backend
 
-### Backend (`backend/.env`)
+Buat file `backend/.env` dengan isi seperti berikut:
 
 ```env
-# Database
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME=sistem_pakar
 
-# JWT
 JWT_SECRET=your-super-secret-key
 JWT_ACCESS_EXPIRE=24h
 JWT_REFRESH_EXPIRE=168h
 
-# Server
 SERVER_PORT=8080
+CORS_ALLOWED_ORIGINS=http://localhost:3000
 ```
 
-### Frontend (`frontend/.env.local`)
+### Frontend
+
+Buat file `frontend/.env.local` dengan isi berikut:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8080/api
 ```
 
----
+## Instalasi dan Menjalankan Aplikasi
 
-## 🚀 Cara Menjalankan
-
-### 1. Setup Database
+### 1. Siapkan database
 
 ```bash
-# Buat database
 mysql -u root -p -e "CREATE DATABASE sistem_pakar;"
-
-# Jalankan migrasi
 mysql -u root -p sistem_pakar < backend/migrations/001_schema.sql
 mysql -u root -p sistem_pakar < backend/migrations/002_seed_data.sql
 ```
 
-### 2. Jalankan Backend
+### 2. Jalankan backend
 
 ```bash
 cd backend
@@ -107,9 +125,9 @@ go mod download
 go run main.go
 ```
 
-Server berjalan di `http://localhost:8080`
+Backend berjalan di `http://localhost:8080`.
 
-### 3. Jalankan Frontend
+### 3. Jalankan frontend
 
 ```bash
 cd frontend
@@ -117,56 +135,82 @@ npm install
 npm run dev
 ```
 
-Aplikasi berjalan di `http://localhost:3000`
+Frontend berjalan di `http://localhost:3000`.
 
----
-
-## 📚 API Endpoints
+## Endpoint API
 
 ### Public
 
-| Method | Endpoint                | Deskripsi                    |
-| ------ | ----------------------- | ---------------------------- |
-| GET    | `/api/questions`        | Daftar pertanyaan konsultasi |
-| POST   | `/api/consultation`     | Submit jawaban konsultasi    |
-| GET    | `/api/consultation/:id` | Hasil konsultasi             |
+| Method | Endpoint                       | Keterangan                                        |
+| ------ | ------------------------------ | ------------------------------------------------- |
+| GET    | `/api/questions`               | Mengambil daftar pertanyaan konsultasi            |
+| POST   | `/api/consultation`            | Mengirim jawaban konsultasi                       |
+| GET    | `/api/consultation/:sessionId` | Mengambil hasil konsultasi berdasarkan session ID |
 
-### Admin (🔒 Protected)
+### Admin
 
-| Method | Endpoint                | Deskripsi            |
-| ------ | ----------------------- | -------------------- |
-| POST   | `/api/admin/login`      | Login admin          |
-| GET    | `/api/admin/jurusan`    | CRUD Jurusan         |
-| GET    | `/api/admin/pertanyaan` | CRUD Pertanyaan      |
-| GET    | `/api/admin/rules`      | CRUD Rules           |
-| GET    | `/api/admin/statistics` | Statistik konsultasi |
+| Method | Endpoint                   | Keterangan             |
+| ------ | -------------------------- | ---------------------- |
+| POST   | `/api/admin/login`         | Login admin            |
+| POST   | `/api/admin/refresh`       | Refresh access token   |
+| POST   | `/api/admin/logout`        | Logout admin           |
+| GET    | `/api/admin/me`            | Ambil data admin aktif |
+| GET    | `/api/admin/jurusan`       | Daftar jurusan         |
+| GET    | `/api/admin/pertanyaan`    | Daftar pertanyaan      |
+| GET    | `/api/admin/rules`         | Daftar rules           |
+| GET    | `/api/admin/consultations` | Riwayat konsultasi     |
+| GET    | `/api/admin/statistics`    | Statistik konsultasi   |
 
----
+## Alur Konsultasi
 
-## 🧪 Metode Sistem Pakar
+1. Pengguna membuka halaman konsultasi dan menjawab daftar pertanyaan.
+2. Frontend mengirim jawaban ke backend.
+3. Backend menyimpan konsultasi, jawaban, dan hasil rekomendasi.
+4. Mesin pakar menghitung rekomendasi jurusan menggunakan Forward Chaining dan Certainty Factor.
+5. Hasil ditampilkan di halaman hasil konsultasi.
 
-### Certainty Factor (CF)
-
-Formula kombinasi CF:
-
-- **CF(H,E) = CF(E) × CF(Rule)**
-- **CF Kombinasi = CF1 + CF2 × (1 - CF1)**
+## Metode Sistem Pakar
 
 ### Forward Chaining
 
-Proses inferensi:
+Metode ini memulai dari fakta yang diberikan pengguna, lalu mencocokkannya dengan aturan yang aktif untuk menghasilkan kandidat jurusan yang sesuai.
 
-1. Kumpulkan fakta (jawaban user)
-2. Evaluasi rules yang sesuai
-3. Hitung CF untuk setiap jurusan
-4. Ranking berdasarkan CF tertinggi
+### Certainty Factor
+
+Metode ini digunakan untuk menghitung tingkat keyakinan setiap kandidat jurusan berdasarkan kombinasi nilai jawaban dan bobot aturan.
+
+Formula dasar yang digunakan:
+
+- `CF(H, E) = CF(E) x CF(Rule)`
+- `CF kombinasi = CF1 + CF2 x (1 - CF1)`
+
+## Pengembangan Lokal
+
+Beberapa perintah yang sering dipakai saat pengembangan:
+
+```bash
+# Backend
+cd backend
+go build
+go test ./...
+
+# Frontend
+cd frontend
+npm run build
+npm run lint
+```
+
+## Catatan Implementasi
+
+- Backend menggunakan arsitektur berlapis: handler, service, repository.
+- Konsultasi disimpan secara atomik dengan transaction untuk menjaga integritas data.
+- Frontend menggunakan App Router Next.js dan hook terpisah untuk state konsultasi.
+- File `.gitignore` sudah disesuaikan untuk artefak umum Go dan Next.js.
+
+## Lisensi
+
+Lisensi proyek belum ditentukan.
 
 ---
 
-## 📝 Lisensi
-
-Proyek ini dilisensikan di bawah [MIT License](LICENSE).
-
----
-
-Made with ❤️ for education
+Made with ❤️ by [riskyakbar15](https://github.com/riskyakbar15) for education.
