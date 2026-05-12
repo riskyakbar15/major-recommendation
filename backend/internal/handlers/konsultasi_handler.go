@@ -60,8 +60,17 @@ func (h *KonsultasiHandler) GetBySessionID(c *gin.Context) {
 }
 
 func (h *KonsultasiHandler) GetAllAdmin(c *gin.Context) {
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Parameter page tidak valid"})
+		return
+	}
+
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Parameter limit tidak valid"})
+		return
+	}
 
 	if page < 1 {
 		page = 1
