@@ -38,12 +38,12 @@ type Hasil struct {
 }
 
 type ConsultationRequest struct {
-	Jawaban []JawabanInput `json:"jawaban" binding:"required"`
+	Jawaban []JawabanInput `json:"jawaban" binding:"required,min=1,dive"`
 }
 
 type JawabanInput struct {
-	PertanyaanID int     `json:"pertanyaan_id" binding:"required"`
-	Nilai        float64 `json:"nilai" binding:"required"`
+	PertanyaanID int     `json:"pertanyaan_id" binding:"gt=0"`
+	Nilai        float64 `json:"nilai" binding:"gte=0,lte=1"`
 }
 
 type ConsultationResponse struct {

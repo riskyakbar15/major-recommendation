@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -14,6 +15,14 @@ type KonsultasiHandler struct {
 	service *services.KonsultasiService
 }
 
+var allowedAnswerValues = map[float64]struct{}{
+	0.0:  {},
+	0.25: {},
+	0.5:  {},
+	0.75: {},
+	1.0:  {},
+}
+
 func NewKonsultasiHandler(service *services.KonsultasiService) *KonsultasiHandler {
 	return &KonsultasiHandler{service: service}
 }
@@ -21,13 +30,14 @@ func NewKonsultasiHandler(service *services.KonsultasiService) *KonsultasiHandle
 func (h *KonsultasiHandler) Create(c *gin.Context) {
 	var req models.ConsultationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		log.Printf("consultation create: invalid payload from ip=%s: %v", c.ClientIP(), err)
+		respondConsultationError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// Validate that we have answers
-	if len(req.Jawaban) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Jawaban tidak boleh kosong"})
+	if err := validateConsultationRequest(req); err != nil {
+		log.Printf("consultation create: validation failed from ip=%s answers=%d: %v", c.ClientIP(), len(req.Jawaban), err)
+		respondConsultationError(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -36,11 +46,45 @@ func (h *KonsultasiHandler) Create(c *gin.Context) {
 
 	response, err := h.service.Create(req, ipAddress)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memproses konsultasi"})
+		log.Printf("consultation create: processing failed from ip=%s answers=%d: %v", ipAddress, len(req.Jawaban), err)
+		respondConsultationError(c, http.StatusInternalServerError, "Gagal memproses konsultasi")
 		return
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+func validateConsultationRequest(req models.ConsultationRequest) error {
+	seenQuestions := make(map[int]struct{}, len(req.Jawaban))
+
+	for _, jawaban := range req.Jawaban {
+		if jawaban.PertanyaanID <= 0 {
+			return &validationError{message: "Pertanyaan ID harus valid"}
+		}
+
+		if _, exists := seenQuestions[jawaban.PertanyaanID]; exists {
+			return &validationError{message: "Setiap pertanyaan hanya boleh dijawab satu kali"}
+		}
+		seenQuestions[jawaban.PertanyaanID] = struct{}{}
+
+		if _, allowed := allowedAnswerValues[jawaban.Nilai]; !allowed {
+			return &validationError{message: "Nilai jawaban harus salah satu dari 0, 0.25, 0.5, 0.75, atau 1"}
+		}
+	}
+
+	return nil
+}
+
+func respondConsultationError(c *gin.Context, status int, message string) {
+	c.JSON(status, gin.H{"error": message})
+}
+
+type validationError struct {
+	message string
+}
+
+func (e *validationError) Error() string {
+	return e.message
 }
 
 func (h *KonsultasiHandler) GetBySessionID(c *gin.Context) {

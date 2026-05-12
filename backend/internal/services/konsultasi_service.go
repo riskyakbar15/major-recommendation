@@ -3,6 +3,8 @@ package services
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"log"
 
 	"sistem-pakar-jurusan/internal/expert"
 	"sistem-pakar-jurusan/internal/models"
@@ -46,6 +48,12 @@ func (s *KonsultasiService) Create(req models.ConsultationRequest, ipAddress str
 	// Get active rules first so the transaction only covers database writes.
 	rules, err := s.ruleRepo.GetActive()
 	if err != nil {
+		log.Printf("consultation service: failed to load active rules: %v", err)
+		return nil, fmt.Errorf("failed to load active rules: %w", err)
+	}
+
+	if len(req.Jawaban) == 0 {
+		log.Printf("consultation service: empty answer set received")
 		return nil, err
 	}
 
@@ -59,7 +67,8 @@ func (s *KonsultasiService) Create(req models.ConsultationRequest, ipAddress str
 		ctx := context.Background()
 		tx, err := s.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
 		if err != nil {
-			return nil, err
+			log.Printf("consultation service: failed to begin transaction: %v", err)
+			return nil, fmt.Errorf("failed to begin transaction: %w", err)
 		}
 		defer func() {
 			_ = tx.Rollback()
@@ -68,39 +77,46 @@ func (s *KonsultasiService) Create(req models.ConsultationRequest, ipAddress str
 		// Create konsultasi record within transaction
 		konsultasi, err = s.konsultasiRepo.CreateTx(ctx, tx, sessionID, ipAddress)
 		if err != nil {
-			return nil, err
+			log.Printf("consultation service: failed to create consultation session_id=%s ip=%s: %v", sessionID, ipAddress, err)
+			return nil, fmt.Errorf("failed to create consultation record: %w", err)
 		}
 
 		// Save answers within transaction
 		if err := s.konsultasiRepo.SaveJawabanTx(ctx, tx, konsultasi.ID, req.Jawaban); err != nil {
-			return nil, err
+			log.Printf("consultation service: failed to save answers consultation_id=%d session_id=%s: %v", konsultasi.ID, sessionID, err)
+			return nil, fmt.Errorf("failed to save consultation answers: %w", err)
 		}
 
 		// Save results within the same transaction when we have recommendations
 		if len(hasil) > 0 {
 			if err := s.konsultasiRepo.SaveHasilTx(ctx, tx, konsultasi.ID, hasil); err != nil {
-				return nil, err
+				log.Printf("consultation service: failed to save results consultation_id=%d session_id=%s: %v", konsultasi.ID, sessionID, err)
+				return nil, fmt.Errorf("failed to save consultation results: %w", err)
 			}
 		}
 
 		if err := tx.Commit(); err != nil {
-			return nil, err
+			log.Printf("consultation service: failed to commit transaction consultation_id=%d session_id=%s: %v", konsultasi.ID, sessionID, err)
+			return nil, fmt.Errorf("failed to commit consultation transaction: %w", err)
 		}
 	} else {
 		// Fallback: non-transactional approach (backward compatible)
 		konsultasi, err = s.konsultasiRepo.Create(sessionID, ipAddress)
 		if err != nil {
-			return nil, err
+			log.Printf("consultation service: failed to create consultation session_id=%s ip=%s: %v", sessionID, ipAddress, err)
+			return nil, fmt.Errorf("failed to create consultation record: %w", err)
 		}
 
 		// Save answers
 		if err := s.konsultasiRepo.SaveJawaban(konsultasi.ID, req.Jawaban); err != nil {
-			return nil, err
+			log.Printf("consultation service: failed to save answers consultation_id=%d session_id=%s: %v", konsultasi.ID, sessionID, err)
+			return nil, fmt.Errorf("failed to save consultation answers: %w", err)
 		}
 
 		if len(hasil) > 0 {
 			if err := s.konsultasiRepo.SaveHasil(konsultasi.ID, hasil); err != nil {
-				return nil, err
+				log.Printf("consultation service: failed to save results consultation_id=%d session_id=%s: %v", konsultasi.ID, sessionID, err)
+				return nil, fmt.Errorf("failed to save consultation results: %w", err)
 			}
 		}
 	}
