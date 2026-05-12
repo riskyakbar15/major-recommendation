@@ -1,13 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  GraduationCap,
-  Brain,
-  Target,
-  ArrowRight,
-  CheckCircle,
-} from "lucide-react";
+import { GraduationCap, Brain, Target, ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
@@ -27,13 +21,13 @@ export default function Home() {
             <div className="flex items-center space-x-4">
               <Link
                 href="/konsultasi"
-                className="text-sm text-blue-600 font-medium hover:underline"
+                className="text-sm text-blue-600 font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
               >
-                Start Consultation
+                Mulai Konsultasi
               </Link>
               <Link
                 href="/admin/login"
-                className="text-sm px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                className="text-sm px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
                 Admin
               </Link>
@@ -59,7 +53,7 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <Link
                 href="/konsultasi"
-                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 transition transform hover:-translate-y-0.5 shadow-lg"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 transition transform hover:-translate-y-0.5 shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 Mulai Konsultasi
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -67,7 +61,8 @@ export default function Home() {
 
               <Link
                 href="#how"
-                className="inline-flex items-center px-5 py-3 bg-white text-gray-800 border border-gray-200 rounded-xl hover:shadow-md transition"
+                className="inline-flex items-center px-5 py-3 bg-white text-gray-800 border border-gray-200 rounded-xl hover:shadow-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                aria-label="Lompat ke bagian cara kerja"
               >
                 Pelajari Lebih Lanjut
               </Link>
@@ -152,7 +147,10 @@ export default function Home() {
         </div>
 
         {/* How it works */}
-        <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg">
+        <div
+          id="how"
+          className="scroll-mt-24 bg-white rounded-2xl p-8 md:p-12 shadow-lg"
+        >
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
             Bagaimana Cara Kerjanya?
           </h2>
