@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"time"
 
@@ -149,6 +150,56 @@ func (r *KonsultasiRepository) GetAll(limit, offset int) ([]models.Konsultasi, i
 	}
 
 	return list, total, nil
+}
+
+// CreateTx creates a new konsultasi record within a transaction
+func (r *KonsultasiRepository) CreateTx(ctx context.Context, tx *sql.Tx, sessionID, ipAddress string) (*models.Konsultasi, error) {
+	query := `INSERT INTO konsultasi (session_id, ip_address) VALUES (?, ?)`
+
+	result, err := tx.ExecContext(ctx, query, sessionID, ipAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.Konsultasi{
+		ID:        int(id),
+		SessionID: sessionID,
+		IPAddress: ipAddress,
+		CreatedAt: time.Now(),
+	}, nil
+}
+
+// SaveJawabanTx saves answers within a transaction
+func (r *KonsultasiRepository) SaveJawabanTx(ctx context.Context, tx *sql.Tx, konsultasiID int, jawaban []models.JawabanInput) error {
+	query := `INSERT INTO jawaban (konsultasi_id, pertanyaan_id, nilai) VALUES (?, ?, ?)`
+
+	for _, j := range jawaban {
+		_, err := tx.ExecContext(ctx, query, konsultasiID, j.PertanyaanID, j.Nilai)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// SaveHasilTx saves results within a transaction
+func (r *KonsultasiRepository) SaveHasilTx(ctx context.Context, tx *sql.Tx, konsultasiID int, hasil []models.Hasil) error {
+	query := `INSERT INTO hasil (konsultasi_id, jurusan_id, cf_final, ranking) VALUES (?, ?, ?, ?)`
+
+	for _, h := range hasil {
+		_, err := tx.ExecContext(ctx, query, konsultasiID, h.JurusanID, h.CFFinal, h.Ranking)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (r *KonsultasiRepository) GetStatistics() (map[string]interface{}, error) {

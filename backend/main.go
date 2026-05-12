@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 
 	"sistem-pakar-jurusan/internal/config"
 	"sistem-pakar-jurusan/internal/database"
@@ -15,6 +16,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
+
+func getEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
 
 func main() {
 	// Load .env file
@@ -45,6 +53,7 @@ func main() {
 	pertanyaanService := services.NewPertanyaanService(pertanyaanRepo)
 	ruleService := services.NewRuleService(ruleRepo)
 	konsultasiService := services.NewKonsultasiService(konsultasiRepo, pertanyaanRepo, ruleRepo, jurusanRepo)
+	konsultasiService.SetDB(db) // Enable transactional consultation creation
 	statistikService := services.NewStatistikService(konsultasiRepo, jurusanRepo)
 
 	// Initialize handlers
@@ -58,9 +67,15 @@ func main() {
 	// Setup Gin router
 	router := gin.Default()
 
-	// CORS configuration
+	// CORS configuration - externalized to environment variable
+	corsOriginsEnv := getEnv("CORS_ALLOWED_ORIGINS", "http://localhost:3000")
+	corsOrigins := strings.Split(corsOriginsEnv, ",")
+	for i := range corsOrigins {
+		corsOrigins[i] = strings.TrimSpace(corsOrigins[i])
+	}
+
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowOrigins:     corsOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

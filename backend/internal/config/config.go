@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 	"time"
 )
@@ -20,13 +21,19 @@ type Config struct {
 }
 
 func Load() *Config {
+	// Validate required JWT_SECRET - fail-fast if missing
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("ERROR: JWT_SECRET environment variable must be set. Refusing to start with insecure default token secret.")
+	}
+
 	return &Config{
 		DBHost:           getEnv("DB_HOST", "localhost"),
 		DBPort:           getEnv("DB_PORT", "3306"),
 		DBUser:           getEnv("DB_USER", "root"),
 		DBPassword:       getEnv("DB_PASSWORD", ""),
 		DBName:           getEnv("DB_NAME", "sistem_pakar"),
-		JWTSecret:        getEnv("JWT_SECRET", "default-secret-key"),
+		JWTSecret:        jwtSecret,
 		JWTAccessExpire:  parseDuration(getEnv("JWT_ACCESS_EXPIRE", "24h")),
 		JWTRefreshExpire: parseDuration(getEnv("JWT_REFRESH_EXPIRE", "168h")),
 		ServerPort:       getEnv("SERVER_PORT", "8080"),
