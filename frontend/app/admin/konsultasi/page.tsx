@@ -37,7 +37,11 @@ export default function AdminKonsultasiPage() {
     try {
       const response = await adminApi.getConsultations(page, 20);
       setKonsultasiList(response.data.data || []);
-      setTotalPages(response.data.total_pages || 1);
+      const calculatedTotalPages = Math.max(
+        1,
+        Math.ceil(response.data.total / response.data.limit),
+      );
+      setTotalPages(calculatedTotalPages);
     } catch (error) {
       console.error("Failed to fetch konsultasi:", error);
     } finally {

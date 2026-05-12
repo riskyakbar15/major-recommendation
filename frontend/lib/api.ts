@@ -1,9 +1,29 @@
 import axios, {
   AxiosInstance,
   AxiosError,
+  AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
 import Cookies from "js-cookie";
+import {
+  Admin,
+  ApiItemResponse,
+  ApiListResponse,
+  ApiMessageResponse,
+  ConsultationListResponse,
+  ConsultationResponse,
+  CreateJurusanRequest,
+  CreatePertanyaanRequest,
+  CreateRuleRequest,
+  Jawaban,
+  Jurusan,
+  Konsultasi,
+  LoginResponse,
+  Pertanyaan,
+  RefreshTokenResponse,
+  Rule,
+  Statistics,
+} from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
@@ -44,9 +64,12 @@ api.interceptors.response.use(
       const refreshToken = Cookies.get("refresh_token");
       if (refreshToken) {
         try {
-          const response = await axios.post(`${API_URL}/admin/refresh`, {
-            refresh_token: refreshToken,
-          });
+          const response = await axios.post<RefreshTokenResponse>(
+            `${API_URL}/admin/refresh`,
+            {
+              refresh_token: refreshToken,
+            },
+          );
 
           const { access_token } = response.data;
           Cookies.set("access_token", access_token);
@@ -80,50 +103,100 @@ export default api;
 
 // API functions for public endpoints
 export const publicApi = {
-  getQuestions: () => api.get("/questions"),
-  submitConsultation: (jawaban: { pertanyaan_id: number; nilai: number }[]) =>
+  getQuestions: (): Promise<AxiosResponse<ApiListResponse<Pertanyaan>>> =>
+    api.get("/questions"),
+  submitConsultation: (
+    jawaban: Jawaban[],
+  ): Promise<AxiosResponse<ConsultationResponse>> =>
     api.post("/consultation", { jawaban }),
-  getConsultationResult: (sessionId: string) =>
+  getConsultationResult: (
+    sessionId: string,
+  ): Promise<AxiosResponse<ApiItemResponse<Konsultasi>>> =>
     api.get(`/consultation/${sessionId}`),
 };
 
 // API functions for admin endpoints
 export const adminApi = {
-  login: (username: string, password: string) =>
+  login: (
+    username: string,
+    password: string,
+  ): Promise<AxiosResponse<LoginResponse>> =>
     api.post("/admin/login", { username, password }),
-  logout: () => api.post("/admin/logout"),
-  getCurrentAdmin: () => api.get("/admin/me"),
-  refreshToken: (refreshToken: string) =>
+  logout: (): Promise<AxiosResponse<ApiMessageResponse>> =>
+    api.post("/admin/logout"),
+  getCurrentAdmin: (): Promise<AxiosResponse<Admin>> => api.get("/admin/me"),
+  refreshToken: (
+    refreshToken: string,
+  ): Promise<AxiosResponse<RefreshTokenResponse>> =>
     api.post("/admin/refresh", { refresh_token: refreshToken }),
 
   // Jurusan
-  getJurusan: () => api.get("/admin/jurusan"),
-  getJurusanById: (id: number) => api.get(`/admin/jurusan/${id}`),
-  createJurusan: (data: any) => api.post("/admin/jurusan", data),
-  updateJurusan: (id: number, data: any) =>
+  getJurusan: (): Promise<AxiosResponse<ApiListResponse<Jurusan>>> =>
+    api.get("/admin/jurusan"),
+  getJurusanById: (
+    id: number,
+  ): Promise<AxiosResponse<ApiItemResponse<Jurusan>>> =>
+    api.get(`/admin/jurusan/${id}`),
+  createJurusan: (
+    data: CreateJurusanRequest,
+  ): Promise<AxiosResponse<ApiItemResponse<Jurusan>>> =>
+    api.post("/admin/jurusan", data),
+  updateJurusan: (
+    id: number,
+    data: CreateJurusanRequest,
+  ): Promise<AxiosResponse<ApiItemResponse<Jurusan>>> =>
     api.put(`/admin/jurusan/${id}`, data),
-  deleteJurusan: (id: number) => api.delete(`/admin/jurusan/${id}`),
+  deleteJurusan: (id: number): Promise<AxiosResponse<ApiMessageResponse>> =>
+    api.delete(`/admin/jurusan/${id}`),
 
   // Pertanyaan
-  getPertanyaan: () => api.get("/admin/pertanyaan"),
-  getPertanyaanById: (id: number) => api.get(`/admin/pertanyaan/${id}`),
-  createPertanyaan: (data: any) => api.post("/admin/pertanyaan", data),
-  updatePertanyaan: (id: number, data: any) =>
+  getPertanyaan: (): Promise<AxiosResponse<ApiListResponse<Pertanyaan>>> =>
+    api.get("/admin/pertanyaan"),
+  getPertanyaanById: (
+    id: number,
+  ): Promise<AxiosResponse<ApiItemResponse<Pertanyaan>>> =>
+    api.get(`/admin/pertanyaan/${id}`),
+  createPertanyaan: (
+    data: CreatePertanyaanRequest,
+  ): Promise<AxiosResponse<ApiItemResponse<Pertanyaan>>> =>
+    api.post("/admin/pertanyaan", data),
+  updatePertanyaan: (
+    id: number,
+    data: CreatePertanyaanRequest,
+  ): Promise<AxiosResponse<ApiItemResponse<Pertanyaan>>> =>
     api.put(`/admin/pertanyaan/${id}`, data),
-  deletePertanyaan: (id: number) => api.delete(`/admin/pertanyaan/${id}`),
+  deletePertanyaan: (id: number): Promise<AxiosResponse<ApiMessageResponse>> =>
+    api.delete(`/admin/pertanyaan/${id}`),
 
   // Rules
-  getRules: () => api.get("/admin/rules"),
-  getRuleById: (id: number) => api.get(`/admin/rules/${id}`),
-  createRule: (data: any) => api.post("/admin/rules", data),
-  updateRule: (id: number, data: any) => api.put(`/admin/rules/${id}`, data),
-  deleteRule: (id: number) => api.delete(`/admin/rules/${id}`),
+  getRules: (): Promise<AxiosResponse<ApiListResponse<Rule>>> =>
+    api.get("/admin/rules"),
+  getRuleById: (id: number): Promise<AxiosResponse<ApiItemResponse<Rule>>> =>
+    api.get(`/admin/rules/${id}`),
+  createRule: (
+    data: CreateRuleRequest,
+  ): Promise<AxiosResponse<ApiItemResponse<Rule>>> =>
+    api.post("/admin/rules", data),
+  updateRule: (
+    id: number,
+    data: CreateRuleRequest,
+  ): Promise<AxiosResponse<ApiItemResponse<Rule>>> =>
+    api.put(`/admin/rules/${id}`, data),
+  deleteRule: (id: number): Promise<AxiosResponse<ApiMessageResponse>> =>
+    api.delete(`/admin/rules/${id}`),
 
   // Consultations
-  getConsultations: (page: number = 1, limit: number = 10) =>
+  getConsultations: (
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<AxiosResponse<ConsultationListResponse>> =>
     api.get(`/admin/consultations?page=${page}&limit=${limit}`),
-  getConsultationDetail: (id: number) => api.get(`/admin/consultations/${id}`),
+  getConsultationDetail: (
+    id: number,
+  ): Promise<AxiosResponse<ApiItemResponse<Konsultasi>>> =>
+    api.get(`/admin/consultations/${id}`),
 
   // Statistics
-  getStatistics: () => api.get("/admin/statistics"),
+  getStatistics: (): Promise<AxiosResponse<ApiItemResponse<Statistics>>> =>
+    api.get("/admin/statistics"),
 };

@@ -130,14 +130,40 @@ export interface LoginResponse {
   admin: Admin;
 }
 
+export interface RefreshTokenResponse {
+  access_token: string;
+  expires_in: number;
+}
+
 export interface ApiResponse<T> {
   data?: T;
   message?: string;
   error?: string;
 }
 
+export interface ApiMessageResponse {
+  message: string;
+}
+
+export interface ApiItemResponse<T> {
+  data: T;
+  message?: string;
+}
+
+export interface ApiListResponse<T> {
+  data: T[];
+  message?: string;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface ConsultationListResponse {
+  data: Konsultasi[];
   total: number;
   page: number;
   limit: number;
