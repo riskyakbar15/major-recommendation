@@ -43,21 +43,26 @@ func (s *KonsultasiService) Create(req models.ConsultationRequest, ipAddress str
 	// Generate session ID
 	sessionID := uuid.New().String()
 
+	// Get active rules first so the transaction only covers database writes.
+	rules, err := s.ruleRepo.GetActive()
+	if err != nil {
+		return nil, err
+	}
+
+	// Process consultation using expert system
+	hasil := expert.ProcessConsultation(rules, req.Jawaban)
+
 	var konsultasi *models.Konsultasi
-	var err error
 
 	// Use transaction if database connection is available, otherwise fall back to non-transactional
 	if s.db != nil {
-		// Transactional approach: wrap all operations atomically
 		ctx := context.Background()
 		tx, err := s.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
 		if err != nil {
 			return nil, err
 		}
 		defer func() {
-			if err != nil {
-				tx.Rollback()
-			}
+			_ = tx.Rollback()
 		}()
 
 		// Create konsultasi record within transaction
@@ -71,11 +76,16 @@ func (s *KonsultasiService) Create(req models.ConsultationRequest, ipAddress str
 			return nil, err
 		}
 
-		// Commit transaction before processing expert system (no transaction needed for read-only expert processing)
+		// Save results within the same transaction when we have recommendations
+		if len(hasil) > 0 {
+			if err := s.konsultasiRepo.SaveHasilTx(ctx, tx, konsultasi.ID, hasil); err != nil {
+				return nil, err
+			}
+		}
+
 		if err := tx.Commit(); err != nil {
 			return nil, err
 		}
-		err = nil // Reset error for deferred rollback check
 	} else {
 		// Fallback: non-transactional approach (backward compatible)
 		konsultasi, err = s.konsultasiRepo.Create(sessionID, ipAddress)
@@ -87,16 +97,13 @@ func (s *KonsultasiService) Create(req models.ConsultationRequest, ipAddress str
 		if err := s.konsultasiRepo.SaveJawaban(konsultasi.ID, req.Jawaban); err != nil {
 			return nil, err
 		}
-	}
 
-	// Get active rules
-	rules, err := s.ruleRepo.GetActive()
-	if err != nil {
-		return nil, err
+		if len(hasil) > 0 {
+			if err := s.konsultasiRepo.SaveHasil(konsultasi.ID, hasil); err != nil {
+				return nil, err
+			}
+		}
 	}
-
-	// Process consultation using expert system
-	hasil := expert.ProcessConsultation(rules, req.Jawaban)
 
 	// Check if we have any results
 	if len(hasil) == 0 {
@@ -105,11 +112,6 @@ func (s *KonsultasiService) Create(req models.ConsultationRequest, ipAddress str
 			Hasil:     []models.Hasil{},
 			Message:   "Tidak ditemukan jurusan yang sesuai dengan profil Anda. Silakan ulangi pengisian dengan jawaban yang lebih sesuai.",
 		}, nil
-	}
-
-	// Save results
-	if err := s.konsultasiRepo.SaveHasil(konsultasi.ID, hasil); err != nil {
-		return nil, err
 	}
 
 	// Enrich hasil with jurusan details
