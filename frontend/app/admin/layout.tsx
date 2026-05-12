@@ -2,7 +2,6 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import Link from "next/link";
 import {
   GraduationCap,
   LayoutDashboard,
@@ -31,8 +30,9 @@ const menuItems = [
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { admin, loading, isAuthenticated } = useAuth();
+  const { admin, loading, isAuthenticated, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated && pathname !== "/admin/login") {
@@ -65,7 +65,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   const handleLogout = async () => {
-    router.push("/admin/login");
+    if (isLoggingOut) {
+      return;
+    }
+
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } finally {
+      router.replace("/admin/login");
+      router.refresh();
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -142,8 +153,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <button
                 type="button"
                 onClick={handleLogout}
+                disabled={isLoggingOut}
                 className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition-colors"
                 title="Logout"
+                aria-label="Logout"
               >
                 <LogOut className="h-5 w-5" />
               </button>
