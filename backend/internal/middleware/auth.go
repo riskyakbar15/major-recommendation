@@ -11,21 +11,12 @@ import (
 
 func JWTAuth(secretKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
+		tokenString := extractToken(c)
+		if tokenString == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization required"})
 			c.Abort()
 			return
 		}
-
-		parts := strings.Split(authHeader, " ")
-		if len(parts) != 2 || parts[0] != "Bearer" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization header format"})
-			c.Abort()
-			return
-		}
-
-		tokenString := parts[1]
 
 		jwtManager := auth.NewJWTManager(secretKey, 0, 0)
 		claims, err := jwtManager.ValidateAccessToken(tokenString)
@@ -45,4 +36,24 @@ func JWTAuth(secretKey string) gin.HandlerFunc {
 
 		c.Next()
 	}
+}
+
+// extractToken resolves the access token from the HttpOnly cookie first,
+// falling back to the Authorization: Bearer header for non-browser API clients.
+func extractToken(c *gin.Context) string {
+	if cookie, err := c.Cookie("access_token"); err == nil && cookie != "" {
+		return cookie
+	}
+
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		return ""
+	}
+
+	parts := strings.Split(authHeader, " ")
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		return ""
+	}
+
+	return parts[1]
 }
