@@ -1,6 +1,8 @@
 package services
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"time"
 
@@ -16,6 +18,14 @@ var (
 	ErrInvalidCredentials = errors.New("invalid username or password")
 	ErrInvalidRefreshToken = errors.New("invalid or expired refresh token")
 )
+
+// hashRefreshToken returns a hex-encoded SHA-256 digest of the refresh token.
+// Refresh tokens are treated like credentials: only their hash is persisted so
+// a database leak cannot be replayed to obtain valid sessions.
+func hashRefreshToken(token string) string {
+	sum := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(sum[:])
+}
 
 type AuthService struct {
 	adminRepo  *repository.AdminRepository
@@ -54,8 +64,8 @@ func (s *AuthService) Login(req models.LoginRequest) (*models.LoginResponse, err
 		return nil, err
 	}
 
-	// Save refresh token to database
-	if err := s.adminRepo.UpdateRefreshToken(admin.ID, refreshToken, refreshExp); err != nil {
+	// Save only the hash of the refresh token to database
+	if err := s.adminRepo.UpdateRefreshToken(admin.ID, hashRefreshToken(refreshToken), refreshExp); err != nil {
 		return nil, err
 	}
 
@@ -73,8 +83,8 @@ func (s *AuthService) Login(req models.LoginRequest) (*models.LoginResponse, err
 }
 
 func (s *AuthService) RefreshToken(req models.RefreshTokenRequest) (*models.RefreshTokenResponse, error) {
-	// Get admin by refresh token
-	admin, err := s.adminRepo.GetByRefreshToken(req.RefreshToken)
+	// Look up admin by the hash of the supplied refresh token
+	admin, err := s.adminRepo.GetByRefreshToken(hashRefreshToken(req.RefreshToken))
 	if err != nil {
 		return nil, ErrInvalidRefreshToken
 	}
