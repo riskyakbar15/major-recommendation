@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -18,6 +19,10 @@ type Config struct {
 	JWTRefreshExpire time.Duration
 
 	ServerPort string
+
+	// CookieSecure controls whether auth cookies carry the Secure flag.
+	// Keep false for local HTTP development, set true in production (HTTPS).
+	CookieSecure bool
 }
 
 func Load() *Config {
@@ -37,6 +42,7 @@ func Load() *Config {
 		JWTAccessExpire:  parseDuration(getEnv("JWT_ACCESS_EXPIRE", "24h")),
 		JWTRefreshExpire: parseDuration(getEnv("JWT_REFRESH_EXPIRE", "168h")),
 		ServerPort:       getEnv("SERVER_PORT", "8080"),
+		CookieSecure:     getEnvBool("COOKIE_SECURE", false),
 	}
 }
 
@@ -45,6 +51,18 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+func getEnvBool(key string, defaultValue bool) bool {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	parsed, err := strconv.ParseBool(value)
+	if err != nil {
+		return defaultValue
+	}
+	return parsed
 }
 
 func parseDuration(s string) time.Duration {
