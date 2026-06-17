@@ -80,7 +80,7 @@ func (cf *CertaintyFactor) combineCFs(cfValues []float64) float64 {
 	// Combine with each subsequent CF
 	for i := 1; i < len(cfValues); i++ {
 		cfNew := cfValues[i]
-		
+
 		if combined >= 0 && cfNew >= 0 {
 			// Both positive: CF_combined = CF_old + CF_new * (1 - CF_old)
 			combined = combined + cfNew*(1-combined)
@@ -93,11 +93,28 @@ func (cf *CertaintyFactor) combineCFs(cfValues []float64) float64 {
 			if abs(cfNew) < minAbs {
 				minAbs = abs(cfNew)
 			}
-			combined = (combined + cfNew) / (1 - minAbs)
+			denom := 1 - minAbs
+			if denom == 0 {
+				// Opposing evidences of full certainty cancel out; avoid Inf/NaN.
+				combined = 0
+			} else {
+				combined = (combined + cfNew) / denom
+			}
 		}
 	}
 
-	return combined
+	return clampCF(combined)
+}
+
+// clampCF constrains a combined CF to the valid [-1, 1] range.
+func clampCF(cf float64) float64 {
+	if cf > 1 {
+		return 1
+	}
+	if cf < -1 {
+		return -1
+	}
+	return cf
 }
 
 func abs(x float64) float64 {
