@@ -62,7 +62,12 @@ func main() {
 	statistikService := services.NewStatistikService(konsultasiRepo, jurusanRepo)
 
 	// Initialize handlers
-	authHandler := handlers.NewAuthHandler(authService)
+	authHandler := handlers.NewAuthHandler(authService, handlers.CookieConfig{
+		Secure:        cfg.CookieSecure,
+		AccessMaxAge:  int(cfg.JWTAccessExpire.Seconds()),
+		RefreshMaxAge: int(cfg.JWTRefreshExpire.Seconds()),
+		Path:          "/",
+	})
 	jurusanHandler := handlers.NewJurusanHandler(jurusanService)
 	pertanyaanHandler := handlers.NewPertanyaanHandler(pertanyaanService)
 	ruleHandler := handlers.NewRuleHandler(ruleService)
@@ -94,9 +99,10 @@ func main() {
 		api.POST("/consultation", konsultasiHandler.Create)
 		api.GET("/consultation/:sessionId", konsultasiHandler.GetBySessionID)
 
-		// Auth routes
-		api.POST("/admin/login", authHandler.Login)
-		api.POST("/admin/refresh", authHandler.RefreshToken)
+		// Auth routes - rate limited to mitigate brute-force attacks
+		authLimiter := middleware.NewRateLimiter(10, time.Minute)
+		api.POST("/admin/login", authLimiter, authHandler.Login)
+		api.POST("/admin/refresh", authLimiter, authHandler.RefreshToken)
 	}
 
 	// Protected admin routes
@@ -142,8 +148,12 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr:    ":" + port,
-		Handler: router,
+		Addr:              ":" + port,
+		Handler:           router,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		IdleTimeout:       60 * time.Second,
 	}
 
 	go func() {
