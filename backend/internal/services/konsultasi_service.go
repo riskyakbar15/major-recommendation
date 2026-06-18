@@ -54,7 +54,7 @@ func (s *KonsultasiService) Create(req models.ConsultationRequest, ipAddress str
 
 	if len(req.Jawaban) == 0 {
 		log.Printf("consultation service: empty answer set received")
-		return nil, err
+		return nil, fmt.Errorf("jawaban tidak boleh kosong")
 	}
 
 	// Process consultation using expert system
