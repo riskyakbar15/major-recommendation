@@ -124,14 +124,11 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
   expires_in: number;
   admin: Admin;
 }
 
 export interface RefreshTokenResponse {
-  access_token: string;
   expires_in: number;
 }
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Cookies from "js-cookie";
 import { adminApi } from "@/lib/api";
 import { Admin, LoginResponse } from "@/types";
 
@@ -11,20 +10,14 @@ export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const checkAuth = useCallback(async () => {
-    const token = Cookies.get("access_token");
-    if (!token) {
-      setLoading(false);
-      setIsAuthenticated(false);
-      return;
-    }
-
+    // The access token lives in an HttpOnly cookie sent automatically; we cannot
+    // read it from JS, so we verify the session by calling the protected endpoint.
     try {
       const response = await adminApi.getCurrentAdmin();
       setAdmin(response.data);
       setIsAuthenticated(true);
     } catch (error) {
-      Cookies.remove("access_token");
-      Cookies.remove("refresh_token");
+      setAdmin(null);
       setIsAuthenticated(false);
     } finally {
       setLoading(false);
@@ -39,29 +32,18 @@ export function useAuth() {
     const response = await adminApi.login(username, password);
     const data: LoginResponse = response.data;
 
-    Cookies.set("access_token", data.access_token, {
-      expires: 1,
-      path: "/",
-      sameSite: "lax",
-    });
-    Cookies.set("refresh_token", data.refresh_token, {
-      expires: 7,
-      path: "/",
-      sameSite: "lax",
-    });
-
+    // Tokens are set by the server as HttpOnly cookies; nothing to store here.
     setAdmin(data.admin);
     setIsAuthenticated(true);
   };
 
   const logout = async (): Promise<void> => {
     try {
+      // Server clears the HttpOnly auth cookies.
       await adminApi.logout();
     } catch (error) {
       // Ignore logout errors
     } finally {
-      Cookies.remove("access_token");
-      Cookies.remove("refresh_token");
       setAdmin(null);
       setIsAuthenticated(false);
     }

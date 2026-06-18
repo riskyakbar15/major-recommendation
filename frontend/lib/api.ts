@@ -4,7 +4,6 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
-import Cookies from "js-cookie";
 import {
   Admin,
   ApiItemResponse,
@@ -27,29 +26,18 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
-// Create axios instance
+// Create axios instance.
+// withCredentials ensures the browser sends the HttpOnly auth cookies on every
+// request; tokens are never read or written by JavaScript.
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Request interceptor to add auth token
-api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = Cookies.get("access_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error: AxiosError) => {
-    return Promise.reject(error);
-  },
-);
-
-// Response interceptor to handle errors
+// Response interceptor to transparently refresh an expired access token.
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -57,41 +45,33 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
-    // If 401 and not already retrying, try to refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // If 401 and not already retrying, attempt a cookie-based token refresh.
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
 
-      const refreshToken = Cookies.get("refresh_token");
-      if (refreshToken) {
-        try {
-          const response = await axios.post<RefreshTokenResponse>(
-            `${API_URL}/admin/refresh`,
-            {
-              refresh_token: refreshToken,
-            },
-          );
+      try {
+        // The refresh token travels in an HttpOnly cookie sent automatically.
+        await axios.post<RefreshTokenResponse>(
+          `${API_URL}/admin/refresh`,
+          {},
+          { withCredentials: true },
+        );
 
-          const { access_token } = response.data;
-          Cookies.set("access_token", access_token);
-
-          originalRequest.headers.Authorization = `Bearer ${access_token}`;
-          return api(originalRequest);
-        } catch (refreshError) {
-          // Refresh failed, clear tokens and redirect to login
-          Cookies.remove("access_token");
-          Cookies.remove("refresh_token");
-          if (typeof window !== "undefined") {
-            window.location.href = "/admin/login";
-          }
-        }
-      } else {
-        // No refresh token, redirect to login
+        // New access token is set as an HttpOnly cookie by the server.
+        return api(originalRequest);
+      } catch (refreshError) {
+        // Refresh failed; only redirect when inside the admin area.
         if (
           typeof window !== "undefined" &&
           window.location.pathname.startsWith("/admin")
         ) {
           window.location.href = "/admin/login";
         }
+        return Promise.reject(refreshError);
       }
     }
 
@@ -125,10 +105,8 @@ export const adminApi = {
   logout: (): Promise<AxiosResponse<ApiMessageResponse>> =>
     api.post("/admin/logout"),
   getCurrentAdmin: (): Promise<AxiosResponse<Admin>> => api.get("/admin/me"),
-  refreshToken: (
-    refreshToken: string,
-  ): Promise<AxiosResponse<RefreshTokenResponse>> =>
-    api.post("/admin/refresh", { refresh_token: refreshToken }),
+  refreshToken: (): Promise<AxiosResponse<RefreshTokenResponse>> =>
+    api.post("/admin/refresh"),
 
   // Jurusan
   getJurusan: (): Promise<AxiosResponse<ApiListResponse<Jurusan>>> =>
