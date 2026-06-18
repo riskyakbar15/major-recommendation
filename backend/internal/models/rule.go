@@ -24,18 +24,18 @@ type Rule struct {
 type CreateRuleRequest struct {
 	KodeRule     string  `json:"kode_rule" binding:"required"`
 	PertanyaanID int     `json:"pertanyaan_id" binding:"required"`
-	Operator     string  `json:"operator" binding:"required"`
-	NilaiKondisi float64 `json:"nilai_kondisi" binding:"required"`
+	Operator     string  `json:"operator" binding:"required,oneof=>= <= ="`
+	NilaiKondisi float64 `json:"nilai_kondisi" binding:"gte=0,lte=1"`
 	JurusanID    int     `json:"jurusan_id" binding:"required"`
-	CFRule       float64 `json:"cf_rule" binding:"required"`
+	CFRule       float64 `json:"cf_rule" binding:"required,gte=-1,lte=1"`
 }
 
 type UpdateRuleRequest struct {
 	KodeRule     string   `json:"kode_rule"`
 	PertanyaanID *int     `json:"pertanyaan_id"`
-	Operator     string   `json:"operator"`
-	NilaiKondisi *float64 `json:"nilai_kondisi"`
+	Operator     string   `json:"operator" binding:"omitempty,oneof=>= <= ="`
+	NilaiKondisi *float64 `json:"nilai_kondisi" binding:"omitempty,gte=0,lte=1"`
 	JurusanID    *int     `json:"jurusan_id"`
-	CFRule       *float64 `json:"cf_rule"`
+	CFRule       *float64 `json:"cf_rule" binding:"omitempty,gte=-1,lte=1"`
 	IsActive     *bool    `json:"is_active"`
 }
