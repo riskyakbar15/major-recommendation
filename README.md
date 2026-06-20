@@ -209,4 +209,10 @@ npm run lint
 
 ---
 
+<!-- markdownlint-disable MD033 -->
+<div align="center">
+
 Made With ❤️ By [riskyakbar15](https://github.com/riskyakbar15) For Education.
+
+</div>
+<!-- markdownlint-enable MD033 -->
