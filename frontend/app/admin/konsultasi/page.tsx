@@ -54,7 +54,12 @@ export default function AdminKonsultasiPage() {
     setDetailModal({ ...konsultasi, hasil: [], jawaban: [] });
     try {
       const response = await adminApi.getConsultationDetail(konsultasi.id);
-      setDetailModal(response.data.data);
+      const detail = response.data.data;
+      setDetailModal({
+        ...detail,
+        hasil: detail.hasil ?? [],
+        jawaban: detail.jawaban ?? [],
+      });
     } catch (error) {
       console.error("Failed to fetch detail:", error);
     } finally {
