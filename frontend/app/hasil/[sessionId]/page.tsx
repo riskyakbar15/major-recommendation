@@ -13,9 +13,10 @@ import {
   AlertCircle,
   Loader2,
   CheckCircle,
+  Sparkles,
 } from "lucide-react";
 import { publicApi } from "@/lib/api";
-import { Konsultasi, Hasil } from "@/types";
+import { Konsultasi } from "@/types";
 
 export default function HasilPage() {
   const params = useParams();
@@ -30,7 +31,7 @@ export default function HasilPage() {
       try {
         const response = await publicApi.getConsultationResult(sessionId);
         setKonsultasi(response.data.data);
-      } catch (err) {
+      } catch {
         setError("Gagal memuat hasil konsultasi");
       } finally {
         setLoading(false);
@@ -124,27 +125,35 @@ export default function HasilPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 animate-fade-up">
           <Link
             href="/"
-            className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-4"
+            className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-4 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali ke Beranda
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Hasil Konsultasi</h1>
-          <p className="text-gray-600 mt-2">Session ID: {sessionId}</p>
+          <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 mb-3">
+            <Sparkles className="h-4 w-4" />
+            Rekomendasi Jurusan
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 text-balance">
+            Hasil Konsultasi
+          </h1>
+          <p className="text-gray-500 mt-2 text-sm font-mono">
+            Session ID: {sessionId}
+          </p>
         </div>
 
         {hasResults ? (
           <>
             {/* Success Message */}
-            <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8 flex items-start">
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 mb-8 flex items-start animate-fade-up">
               <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-semibold text-green-900">
+                <h2 className="font-semibold text-green-900">
                   Analisis Selesai!
-                </h3>
+                </h2>
                 <p className="text-green-700">
                   Berdasarkan jawaban Anda, berikut adalah {hasil.length}{" "}
                   jurusan yang paling sesuai dengan minat dan bakat Anda.
@@ -153,19 +162,21 @@ export default function HasilPage() {
             </div>
 
             {/* Results */}
-            <div className="space-y-4 mb-8">
+            <div className="space-y-4 mb-8 stagger">
               {hasil
                 .sort((a, b) => a.ranking - b.ranking)
                 .map((h) => (
                   <div
                     key={h.id}
-                    className={`rounded-xl border-2 p-6 ${getRankBgColor(h.ranking)}`}
+                    className={`rounded-2xl border-2 p-6 shadow-sm transition-transform hover:-translate-y-0.5 animate-fade-up ${getRankBgColor(h.ranking)}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4 flex-1">
-                        <div className="mt-1">{getRankIcon(h.ranking)}</div>
+                        <div className="mt-1 flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-white/70 shadow-inner">
+                          {getRankIcon(h.ranking)}
+                        </div>
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
+                          <div className="flex flex-wrap items-center gap-3 mb-2">
                             <h3 className="text-xl font-bold text-gray-900">
                               {h.ranking}. {h.jurusan_nama}
                             </h3>
@@ -175,22 +186,33 @@ export default function HasilPage() {
                               {getCFLabel(h.cf_final)}
                             </span>
                           </div>
-                          <p className="text-gray-600 mb-3">
+                          <p className="text-gray-600 mb-4">
                             {h.jurusan_deskripsi}
                           </p>
-                          <div className="flex items-center gap-4 text-sm">
-                            <div>
-                              <span className="text-gray-600">Kepastian:</span>
-                              <p className="font-semibold text-gray-900">
+
+                          {/* Confidence bar */}
+                          <div className="mb-4">
+                            <div className="flex items-center justify-between text-xs mb-1">
+                              <span className="text-gray-500">
+                                Tingkat Kepastian
+                              </span>
+                              <span className="font-semibold text-gray-900">
                                 {(h.cf_final * 100).toFixed(1)}%
-                              </p>
+                              </span>
                             </div>
-                            <div>
-                              <span className="text-gray-600">Kategori:</span>
-                              <p className="font-semibold text-gray-900">
-                                {h.jurusan_kategori}
-                              </p>
-                            </div>
+                            <progress
+                              className="progress-native"
+                              value={Number((h.cf_final * 100).toFixed(1))}
+                              max={100}
+                              aria-label="Tingkat kepastian"
+                            />
+                          </div>
+
+                          <div className="inline-flex items-center gap-2 rounded-lg bg-white/60 px-3 py-1.5 text-sm">
+                            <span className="text-gray-500">Kategori:</span>
+                            <span className="font-semibold text-gray-900">
+                              {h.jurusan_kategori}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -200,13 +222,13 @@ export default function HasilPage() {
             </div>
 
             {/* CTA */}
-            <div className="bg-white rounded-xl p-6 text-center border border-gray-200">
+            <div className="bg-white rounded-2xl p-6 text-center border border-gray-200 shadow-sm animate-fade-up">
               <p className="text-gray-600 mb-4">
                 Ingin mencoba konsultasi lagi dengan jawaban yang berbeda?
               </p>
               <Link
                 href="/konsultasi"
-                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition transform hover:-translate-y-0.5 shadow-lg shadow-blue-600/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Ulangi Konsultasi
@@ -214,7 +236,7 @@ export default function HasilPage() {
             </div>
           </>
         ) : (
-          <div className="bg-white rounded-xl p-8 text-center border border-gray-200">
+          <div className="bg-white rounded-2xl p-8 text-center border border-gray-200 shadow-sm animate-fade-up">
             <GraduationCap className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-gray-900 mb-2">
               Belum Ada Hasil
