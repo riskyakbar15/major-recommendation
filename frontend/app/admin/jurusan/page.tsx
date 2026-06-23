@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, X, Search, Loader2, Check } from "lucide-react";
-import { adminApi } from "@/lib/api";
+import { adminApi, getApiErrorMessage } from "@/lib/api";
 import { Jurusan, CreateJurusanRequest } from "@/types";
 
 export default function AdminJurusanPage() {
@@ -76,8 +76,8 @@ export default function AdminJurusanPage() {
       }
       setIsModalOpen(false);
       fetchJurusan();
-    } catch (error: any) {
-      alert(error.response?.data?.error || "Gagal menyimpan data");
+    } catch (error) {
+      alert(getApiErrorMessage(error, "Gagal menyimpan data"));
     } finally {
       setSaving(false);
     }
@@ -89,8 +89,8 @@ export default function AdminJurusanPage() {
     try {
       await adminApi.deleteJurusan(id);
       fetchJurusan();
-    } catch (error: any) {
-      alert(error.response?.data?.error || "Gagal menghapus data");
+    } catch (error) {
+      alert(getApiErrorMessage(error, "Gagal menghapus data"));
     } finally {
       setDeleteId(null);
     }
@@ -104,13 +104,13 @@ export default function AdminJurusanPage() {
   );
 
   return (
-    <div>
+    <div className="animate-fade-up">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Kelola Jurusan</h1>
         <button
           type="button"
           onClick={handleOpenCreate}
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center rounded-lg bg-gradient-to-r from-primary-600 to-indigo-600 px-4 py-2 text-white shadow-sm transition-colors hover:from-primary-700 hover:to-indigo-700"
         >
           <Plus className="h-5 w-5 mr-2" />
           Tambah Jurusan
