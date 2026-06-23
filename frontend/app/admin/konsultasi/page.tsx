@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Search,
   Loader2,
-  Calendar,
   Eye,
   X,
   ChevronLeft,
@@ -28,11 +27,7 @@ export default function AdminKonsultasiPage() {
   const [detailModal, setDetailModal] = useState<KonsultasiDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
-  useEffect(() => {
-    fetchKonsultasi();
-  }, [page]);
-
-  const fetchKonsultasi = async () => {
+  const fetchKonsultasi = useCallback(async () => {
     setLoading(true);
     try {
       const response = await adminApi.getConsultations(page, 20);
@@ -47,7 +42,11 @@ export default function AdminKonsultasiPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page]);
+
+  useEffect(() => {
+    fetchKonsultasi();
+  }, [fetchKonsultasi]);
 
   const handleViewDetail = async (konsultasi: Konsultasi) => {
     setLoadingDetail(true);
@@ -82,7 +81,7 @@ export default function AdminKonsultasiPage() {
   };
 
   return (
-    <div>
+    <div className="animate-fade-up">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
