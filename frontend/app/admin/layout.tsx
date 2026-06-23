@@ -99,7 +99,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-4 bg-gray-800">
             <div className="flex items-center space-x-2">
-              <GraduationCap className="h-8 w-8 text-blue-500" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-indigo-600 shadow-sm">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
               <span className="text-lg font-bold text-white">
                 SiPakar Admin
               </span>
@@ -124,7 +126,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   key={item.href}
                   className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors cursor-pointer ${
                     isActive
-                      ? "bg-blue-600 text-white"
+                      ? "bg-gradient-to-r from-primary-600 to-indigo-600 text-white shadow-sm"
                       : "text-gray-300 hover:bg-gray-800 hover:text-white"
                   }`}
                   onClick={() => router.push(item.href)}
@@ -140,7 +142,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <div className="p-4 border-t border-gray-800">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary-600 to-indigo-600 font-medium text-white">
                   {admin?.nama?.charAt(0) || "A"}
                 </div>
                 <div className="ml-3">
